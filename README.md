@@ -1,4 +1,4 @@
-════════════════════════════════════ DOCUMENTATION ════════════════════════════════════
+══════════════════ DOCUMENTATION ══════════════════
 
 PCAP IDS Analyzer - Project Documentation
 
@@ -146,7 +146,7 @@ Validation is done by running the analyzer against known PCAP inputs and reviewi
 - No deep payload inspection
 - Threshold/rule based detection (not ML-based)
 
-════════════════════════════════════ HOW TO USE ════════════════════════════════════
+══════════════════ HOW TO USE ══════════════════
 
 PCAP IDS - Commands and Custom Rules Guide
 
