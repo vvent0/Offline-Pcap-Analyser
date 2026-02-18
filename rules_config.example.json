@@ -1,0 +1,23 @@
+{
+  "rules": [
+    {
+      "type": "tcp_syn_scan",
+      "sid": 1000101,
+      "rev": 1,
+      "msg": "Potential TCP SYN scan (strict)",
+      "priority": 1,
+      "proto": "TCP",
+      "unique_syn_targets_threshold": 100
+    },
+    {
+      "type": "high_rate_connection_attempts",
+      "sid": 1000102,
+      "rev": 1,
+      "msg": "High-rate TCP connection attempts (strict)",
+      "priority": 1,
+      "proto": "TCP",
+      "attempts_threshold": 200,
+      "window_seconds": 1.0
+    }
+  ]
+}
