@@ -58,7 +58,8 @@ python pcap_ids.py capture.pcapng --rules-config my_rules.json --json-out alerts
 ├── rules_config.example.json    # Example of custom rules
 ````
 #### Built-in Detection Rules
-You can extend detection capabilities by creating custom rule files.
+You can extend detection capabilities by creating custom rule files. <br />
+
 **Option A**
 Object with "rules" array
 ````
