@@ -1,3 +1,153 @@
+════════════════════════════════════ DOCUMENTATION ════════════════════════════════════
+
+PCAP IDS Analyzer - Project Documentation
+
+1. Overview
+This project is a minimal offline IDS analyzer written in Python with Scapy.
+It reads packets from a PCAP/PCAPNG file and detects:
+- TCP SYN scan behavior
+- High-rate TCP connection attempts per source IP
+
+Alerts are produced in two outputs:
+- Console: Snort-style alert lines
+- File: JSON alert array
+
+The script is designed to run unmodified on Windows and Linux.
+
+
+2. Project Files
+- pcap_ids.py
+  Main analyzer implementation and CLI entrypoint.
+- requirements.txt
+  Python dependencies.
+- rules_config.example.json
+  Example config that adds extra detection rules.
+- PROJECT_DOCUMENTATION.txt
+  This documentation file.
+
+
+3. Requirements
+- Python 3.10 or newer recommended
+- pip
+- scapy>=2.5.0
+
+
+4. Setup
+4.1 Windows (PowerShell)
+1) Create virtual environment:
+   python -m venv .venv
+2) Activate virtual environment:
+   .venv\Scripts\Activate.ps1
+3) Install dependencies:
+   python -m pip install --upgrade pip
+   python -m pip install -r requirements.txt
+
+4.2 Linux (bash)
+1) Create virtual environment:
+   python3 -m venv .venv
+2) Activate virtual environment:
+   source .venv/bin/activate
+3) Install dependencies:
+   python -m pip install --upgrade pip
+   python -m pip install -r requirements.txt
+
+
+5. Running the Analyzer
+Basic command:
+python pcap_ids.py <input_capture.pcap> --json-out alerts.json
+
+Example:
+python pcap_ids.py capture.pcapng --json-out alerts.json
+
+Optional tuning for built-in rules:
+python pcap_ids.py capture.pcapng --syn-scan-threshold 30 --rate-threshold 80 --rate-window 2.0
+
+
+6. Rule System
+6.1 Built-in default rules
+The analyzer always loads these two default rule types:
+- tcp_syn_scan
+- high_rate_connection_attempts
+
+6.2 Adding rules from config
+You can append more rules with:
+python pcap_ids.py capture.pcapng --rules-config rules_config.example.json
+
+Behavior:
+- Built-in default rules stay active.
+- Config rules are added in addition to defaults.
+- Invalid/unsupported rules raise a configuration error.
+
+Accepted config structures:
+- Object form: { "rules": [ ... ] }
+- Array form: [ ... ]
+
+Supported rule types and fields:
+
+tcp_syn_scan:
+- type (required): "tcp_syn_scan"
+- unique_syn_targets_threshold (positive integer)
+- sid (optional positive integer; auto-assigned if omitted)
+- rev (optional positive integer)
+- msg (optional non-empty string)
+- priority (optional positive integer)
+- proto (optional non-empty string)
+- enabled (optional boolean, default true)
+
+high_rate_connection_attempts:
+- type (required): "high_rate_connection_attempts"
+- attempts_threshold (positive integer)
+- window_seconds (positive number)
+- sid (optional positive integer; auto-assigned if omitted)
+- rev (optional positive integer)
+- msg (optional non-empty string)
+- priority (optional positive integer)
+- proto (optional non-empty string)
+- enabled (optional boolean, default true)
+
+
+7. Alert Format
+7.1 Console output (Snort style)
+Example:
+02/18-14:32:10.123456 [**] [1:1000001:1] Potential TCP SYN scan [**] [Priority: 2] {TCP} 10.0.0.5:45678 -> 192.168.1.10:80
+
+7.2 JSON output
+Each alert object contains:
+- type
+- timestamp (UTC ISO 8601)
+- src_ip
+- rule:
+  - gid
+  - sid
+  - rev
+  - msg
+  - priority
+  - proto
+- details
+
+
+8. Performance Characteristics
+The analyzer is optimized for large capture files:
+- Streaming packet read via Scapy `PcapReader`
+- Streaming JSON writer (no full alert list in memory)
+- Bounded per-source structures for rate tracking
+- Periodic cleanup of stale per-source state
+- SYN scan target tracking released after alert for a source
+
+
+9. Validation Status
+There are currently no unit tests included in this project tree.
+Validation is done by running the analyzer against known PCAP inputs and reviewing console/JSON output.
+
+
+10. Scope and Limitations
+- Offline analysis only (no live capture)
+- Detection focused on TCP SYN-based behavior only
+- No deep payload inspection
+- Threshold/rule based detection (not ML-based)
+
+════════════════════════════════════ HOW TO USE ════════════════════════════════════
+
 PCAP IDS - Commands and Custom Rules Guide
 
 1. What this guide covers
